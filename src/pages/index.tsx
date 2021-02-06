@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Typography } from "@material-ui/core";
 import { Link, graphql, PageProps } from "gatsby";
 
@@ -17,8 +17,19 @@ type ResponseType = {
 };
 
 const IndexPage: FC<PageProps<ResponseType>> = ({ data }) => {
-  console.log(data);
+  const [msg, setMsg] = useState("No Data :(");
   const posts = data.allContentfulBlogPost.edges;
+
+  useEffect(() => {
+    (async () => {
+      fetch("/.netlify/functions/hello?name=Sharjeel")
+        .then(_ => _.json())
+        .then((_: { message: string }) => {
+          setMsg(_.message);
+        });
+    })();
+  }, []);
+
   return (
     <Layout>
       <h1>Hello World</h1>
@@ -35,6 +46,9 @@ const IndexPage: FC<PageProps<ResponseType>> = ({ data }) => {
           </li>
         ))}
       </ul>
+      <Typography variant="h4" component="h2">
+        {msg}
+      </Typography>
     </Layout>
   );
 };
